@@ -201,14 +201,74 @@ g++ -std=c++17 compiler.cpp -o compiler.exe
 
 ## Run Web App
 
+Install dependencies:
+
 ```bash
 pip install flask
+```
+
+Run the application:
+
+```bash
 python app.py
 ```
 
-Open http://127.0.0.1:5000
+Open in your browser:
+
+```text
+http://127.0.0.1:5000
+```
+
+Note: This URL runs locally on your machine. Other users must run the application themselves to access the interface.
 
 ## Supported Features
+
+### Variables & Types
+- [x] int
+- [x] float
+- [x] double
+- [x] string
+- [x] bool
+- [x] char
+- [x] Type inference (`let`)
+
+### Control Flow
+- [x] if / else if / else
+- [x] while loops
+- [x] do-while loops
+- [x] for loops
+- [x] switch / case / default
+- [x] break / continue
+- [x] ternary operator
+
+### Functions
+- [x] Function definitions
+- [x] Recursive functions
+- [x] Return statements
+
+### Object-Oriented Programming
+- [x] Basic classes
+- [x] Methods
+- [x] Member variables
+- [ ] Advanced constructors
+- [ ] Full inheritance support
+
+### Exception Handling
+- [x] try
+- [x] catch
+- [x] finally
+
+### Compiler Pipeline
+- [x] Lexer
+- [x] Recursive descent parser
+- [x] AST generation
+- [x] Semantic analysis
+- [x] IR generation
+- [x] Constant folding
+- [x] Dead code elimination
+- [x] Python code generation
+- [x] C++ code generation
+- [x] Java code generation
 
 ### Variables & Types
 ```
