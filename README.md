@@ -102,7 +102,7 @@ Input Source Code
 
 
 ## Screenshots
-```
+
 ### Web Interface
 ![Web UI](screenshots/ui.png)
 
