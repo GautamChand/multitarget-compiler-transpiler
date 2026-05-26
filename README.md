@@ -1,6 +1,49 @@
 # Multi-Target Source-to-Source Compiler
 
-A full-featured source-to-source compiler/transpiler that converts a C-like input language to **Python**, **C++**, and **Java**.
+A multi-target source-to-source compiler/transpiler that converts a C-like input language to **Python**, **C++**, and **Java**.
+
+## Project Status
+
+Current stage: Active Development
+
+Implemented:
+- Lexer with 60+ token types
+- Recursive descent parser
+- AST generation
+- Semantic analysis
+- IR generation
+- Basic optimizations
+- Python/C++/Java code generation
+
+Under development:
+- Advanced OOP support
+- Constructor parsing
+- Complex object initialization
+- Full library mapping
+- Advanced function signatures
+
+ ## Supported
+
+Variables and primitive types
+Arithmetic expressions
+If/Else
+While loops
+For loops
+Recursive functions
+Arrays
+Exception handling
+Basic OOP
+Semantic analysis
+IR generation
+
+## Planned
+
+Constructor initialization
+Full inheritance handling
+Templates/generics
+Async/threading
+Complete standard library mapping
+Advanced object expressions
 
 ## Architecture
 
@@ -23,6 +66,18 @@ Input Source Code
        ↓
    Output Code
 ```
+
+## Screenshots
+
+### Main UI
+![Main UI](screenshots/ui.png)
+
+### AST Viewer
+![AST](screenshots/ast.png)
+
+### IR viewer
+![Conversion](screenshots/ir.png)
+
 
 ## Build
 
