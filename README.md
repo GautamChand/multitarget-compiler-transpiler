@@ -69,14 +69,17 @@ Input Source Code
 
 ## Screenshots
 
-### Main UI
-![Main UI](screenshots/ui.png)
+### Web Interface
+![Web UI](screenshots/ui.png)
 
-### AST Viewer
+### AST View
 ![AST](screenshots/ast.png)
 
-### IR viewer
-![Conversion](screenshots/ir.png)
+### IR View
+![IR](screenshots/ir.png)
+
+### Optimized IR
+![Optimized IR](screenshots/optimized_ir.png)
 
 
 ## Build
