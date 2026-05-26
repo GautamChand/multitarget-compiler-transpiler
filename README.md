@@ -101,6 +101,55 @@ Input Source Code
    Output Code
 
 
+## Example Conversion
+
+Input:
+
+```c
+let x=5;
+print(x);
+```
+
+Output (Python):
+
+```python
+x=5
+print(x)
+```
+
+Output (C++):
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main(){
+
+int x=5;
+
+cout<<x<<endl;
+
+return 0;
+
+}
+```
+
+Output (Java):
+
+```java
+public class Main{
+
+public static void main(String[] args){
+
+int x=5;
+
+System.out.println(x);
+
+}
+
+}
+```
+
 ## Contributing
 
 Contributions are welcome.
