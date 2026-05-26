@@ -82,24 +82,63 @@ multitarget-compiler-transpiler/
 
 ## Architecture
 
-Input Source Code
-       ↓
-    [Lexer]         60+ token types
-       ↓
-    [Parser]        Recursive descent, full operator precedence
-       ↓
-     [AST]          30+ node types (shared_ptr)
-       ↓
- [Semantic Analyzer] Symbol table, scope checking, type inference
-       ↓
-  [IR Generator]    Extended intermediate representation
-       ↓
-  [Optimizer]       Constant folding, dead code elimination,
-       ↓            copy propagation, algebraic simplification
- [Code Generator]   AST-walking generators for Python/C++/Java
-       ↓
-   Output Code
-
+```text
+                    Input Source Code
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ Lexer                                   │
+│ • 60+ token types                       │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ Parser                                  │
+│ • Recursive descent                     │
+│ • Full operator precedence              │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ AST                                     │
+│ • 30+ node types                        │
+│ • shared_ptr hierarchy                  │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ Semantic Analyzer                       │
+│ • Symbol table                          │
+│ • Scope checking                        │
+│ • Type inference                        │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ IR Generator                            │
+│ • Extended IR generation                │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ Optimizer                               │
+│ • Constant folding                      │
+│ • Dead code elimination                 │
+│ • Copy propagation                      │
+│ • Algebraic simplification              │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────┐
+│ Code Generator                          │
+│ • Python generation                     │
+│ • C++ generation                        │
+│ • Java generation                       │
+└─────────────────────────────────────────┘
+                            │
+                            ▼
+                     Output Source Code
+```
 
 ## Example Conversion
 
