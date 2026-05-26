@@ -7,34 +7,36 @@ A multi-target source-to-source compiler/transpiler that converts a C-like input
 Current stage: Active Development
 
 Implemented:
-- Lexer with 60+ token types
-- Recursive descent parser
-- AST generation
-- Semantic analysis
-- IR generation
-- Basic optimizations
-- Python/C++/Java code generation
+
+- [x] Lexer with 60+ token types
+- [x] Recursive descent parser
+- [x] AST generation
+- [x] Semantic analysis
+- [x] IR generation
+- [x] Basic optimizations
+- [x] Python/C++/Java code generation
 
 Under development:
-- Advanced OOP support
-- Constructor parsing
-- Complex object initialization
-- Full library mapping
-- Advanced function signatures
 
- ## Supported
+- [ ] Advanced OOP support
+- [ ] Constructor parsing
+- [ ] Complex object initialization
+- [ ] Full library mapping
+- [ ] Advanced function signatures
 
-Variables and primitive types
-Arithmetic expressions
-If/Else
-While loops
-For loops
-Recursive functions
-Arrays
-Exception handling
-Basic OOP
-Semantic analysis
-IR generation
+## Supported
+
+- Variables and primitive types
+- Arithmetic expressions
+- If/Else
+- While loops
+- For loops
+- Recursive functions
+- Arrays
+- Exception handling
+- Basic OOP
+- Semantic analysis
+- IR generation
 
 ## Planned
 
@@ -45,9 +47,41 @@ Async/threading
 Complete standard library mapping
 Advanced object expressions
 
+## Project Structure
+
+```text
+multitarget-compiler-transpiler/
+│
+├── compiler.cpp        # Core compiler implementation
+├── app.py              # Flask web application
+├── README.md           # Project documentation
+├── .gitignore
+│
+├── screenshots/
+│   ├── ui.png
+│   ├── ast.png
+│   ├── ir.png
+│   └── optimized_ir.png
+│
+├── templates/
+│   └── index.html      # Frontend page
+│
+├── static/
+│   └── style.css       # UI styling
+│
+├── tests/
+│   ├── test_binary_search.txt
+│   ├── test_control_flow.txt
+│   ├── test_datatypes.txt
+│   ├── test_exception.txt
+│   ├── test_linked_list.txt
+│   ├── test_oop.txt
+│   ├── test_recursive.txt
+│   └── test_stack.txt
+```
+
 ## Architecture
 
-```
 Input Source Code
        ↓
     [Lexer]         60+ token types
@@ -65,10 +99,10 @@ Input Source Code
  [Code Generator]   AST-walking generators for Python/C++/Java
        ↓
    Output Code
-```
+
 
 ## Screenshots
-
+```
 ### Web Interface
 ![Web UI](screenshots/ui.png)
 
@@ -81,7 +115,7 @@ Input Source Code
 ### Optimized IR
 ![Optimized IR](screenshots/optimized_ir.png)
 
-
+```
 ## Build
 
 ```bash
