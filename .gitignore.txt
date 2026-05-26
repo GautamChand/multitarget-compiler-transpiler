@@ -1,0 +1,6 @@
+*.exe
+compiler
+g++
+.vscode/
+__pycache__/
+*.pyc
