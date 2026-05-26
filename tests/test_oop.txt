@@ -1,0 +1,39 @@
+// OOP: Class with inheritance
+class Animal {
+    public:
+    string name;
+    int age;
+
+    Animal(string n, int a) {
+        this.name = n;
+        this.age = a;
+    }
+
+    void speak() {
+        print("...");
+    }
+
+    void display() {
+        print(this.name);
+        print(this.age);
+    }
+}
+
+class Dog extends Animal {
+    public:
+    string breed;
+
+    Dog(string n, int a, string b) {
+        this.name = n;
+        this.age = a;
+        this.breed = b;
+    }
+
+    void speak() {
+        print("Woof!");
+    }
+}
+
+Dog d = new Dog("Rex", 5, "Labrador");
+d.speak();
+d.display();

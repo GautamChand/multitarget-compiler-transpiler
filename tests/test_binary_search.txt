@@ -1,0 +1,18 @@
+// Binary Search function
+int binarySearch(int[] arr, int target, int low, int high) {
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        if (arr[mid] == target) {
+            return mid;
+        } else if (arr[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    return -1;
+}
+
+int[] nums = {1, 3, 5, 7, 9, 11, 13};
+int result = binarySearch(nums, 7, 0, 6);
+print(result);

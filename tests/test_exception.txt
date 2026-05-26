@@ -1,0 +1,16 @@
+// Exception handling test
+int divide(int a, int b) {
+    if (b == 0) {
+        throw "Division by zero";
+    }
+    return a / b;
+}
+
+try {
+    int result = divide(10, 0);
+    print(result);
+} catch (Exception e) {
+    print("Error caught!");
+} finally {
+    print("Cleanup done");
+}

@@ -1,0 +1,45 @@
+// String and data type tests
+string greeting = "Hello, World!";
+print(greeting);
+
+int x = 42;
+double pi = 3.14159;
+bool flag = true;
+char ch = 'A';
+
+print(x);
+print(pi);
+print(flag);
+print(ch);
+
+// Ternary operator
+int max = (x > 30) ? x : 30;
+print(max);
+
+// String with expressions
+string name = "Compiler";
+print(name);
+
+// Nested if with logical operators
+if (x > 10 && flag) {
+    print("Both conditions true");
+}
+
+if (x < 10 || pi > 3.0) {
+    print("At least one true");
+}
+
+if (!false) {
+    print("Negation works");
+}
+
+// Array operations
+int[] arr = {10, 20, 30, 40, 50};
+print(arr[0]);
+print(arr[2]);
+print(arr[4]);
+
+// For-each loop
+for (int item : arr) {
+    print(item);
+}

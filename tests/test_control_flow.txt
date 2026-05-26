@@ -1,0 +1,49 @@
+// Recursive factorial
+int factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+// For loop test
+for (int i = 1; i <= 10; i++) {
+    int f = factorial(i);
+    print(f);
+}
+
+// If-else chain
+int x = 42;
+if (x > 100) {
+    print("big");
+} else if (x > 50) {
+    print("medium");
+} else if (x > 0) {
+    print("small");
+} else {
+    print("zero or negative");
+}
+
+// Switch statement
+int day = 3;
+switch (day) {
+    case 1:
+        print("Monday");
+        break;
+    case 2:
+        print("Tuesday");
+        break;
+    case 3:
+        print("Wednesday");
+        break;
+    default:
+        print("Other day");
+        break;
+}
+
+// Do-while loop
+int count = 5;
+do {
+    print(count);
+    count = count - 1;
+} while (count > 0);

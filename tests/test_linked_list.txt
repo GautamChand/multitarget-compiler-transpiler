@@ -1,0 +1,32 @@
+// Linked list node and operations
+class Node {
+    public:
+    int data;
+    Node next;
+
+    Node(int val) {
+        this.data = val;
+    }
+}
+
+class LinkedList {
+    public:
+    Node head;
+
+    void insert(int val) {
+        Node newNode = new Node(val);
+        newNode.next = this.head;
+        this.head = newNode;
+    }
+
+    void display() {
+        Node current = this.head;
+        print("List contents printed");
+    }
+}
+
+LinkedList list = new LinkedList();
+list.insert(10);
+list.insert(20);
+list.insert(30);
+list.display();

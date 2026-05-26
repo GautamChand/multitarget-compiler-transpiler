@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Target Compiler</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Prism.js Dark Theme -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <form id="compile-form" method="POST" action="/">
+    <div id="app-container">
+
+      <!-- ══════════ HEADER ══════════ -->
+      <header id="app-header">
+        <div id="header-brand">
+          <div id="header-logo">⚡</div>
+          <div>
+            <span id="header-title">Multi-Target Compiler</span>
+            <span id="header-subtitle"> — Transpiler IDE</span>
+          </div>
+        </div>
+        <div id="header-actions">
+          <span class="kbd">Ctrl+Enter</span>
+        </div>
+      </header>
+
+      <!-- ══════════ TOOLBAR ══════════ -->
+      <div id="toolbar">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Source</span>
+          <div class="select-wrapper">
+            <select id="source-language-select" name="source" class="select-styled" aria-label="Source language">
+              {% for lang in source_languages %}
+              <option value="{{ lang }}" {% if lang == source %}selected{% endif %}>{{ lang }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-separator"></div>
+
+        <div class="toolbar-group">
+          <span class="toolbar-label">Target</span>
+          <div class="select-wrapper">
+            <select id="target-language-select" name="target" class="select-styled" aria-label="Target language">
+              {% for lang in target_languages %}
+              <option value="{{ lang }}" {% if lang == target %}selected{% endif %}>{{ lang }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-separator"></div>
+
+        <div class="toolbar-group">
+          <button type="submit" id="compile-btn" class="btn btn-primary" data-tooltip="Compile (Ctrl+Enter)">
+            <span class="btn-label">▶ Compile</span>
+            <span class="spinner"></span>
+          </button>
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <div class="toolbar-group">
+          <button type="button" id="clear-btn" class="btn btn-secondary" data-tooltip="Clear editor">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════ WORKSPACE ══════════ -->
+      <div id="workspace">
+
+        <!-- ── Editor Panel ── -->
+        <div id="editor-panel">
+          <div class="panel-header">
+            <div class="panel-tab active">
+              <span class="panel-tab-icon">📄</span>
+              source.txt
+              <span class="panel-tab-dot"></span>
+            </div>
+          </div>
+          <div id="code-editor-wrapper">
+            <textarea
+              id="code-editor"
+              name="code"
+              placeholder="// Enter your source code here...&#10;// Then select a target language and hit Compile.&#10;&#10;let x = 10;&#10;let y = 20;&#10;let z = x + y;&#10;print(z);"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            >{{ code }}</textarea>
+          </div>
+        </div>
+
+        <!-- ── Resize Handle ── -->
+        <div id="resize-handle" role="separator" aria-orientation="vertical"></div>
+
+        <!-- ── Output Panel ── -->
+        <div id="output-panel">
+          <!-- Tabs -->
+          <div id="output-tabs">
+            <div class="output-tab active" data-tab="output-tab-pane" id="tab-output">
+              Output
+              {% if compiled and result.output %}<span class="tab-badge">✓</span>{% endif %}
+            </div>
+            <div class="output-tab" data-tab="ast-tab-pane" id="tab-ast">
+              AST
+              {% if compiled and result.ast %}<span class="tab-badge">✓</span>{% endif %}
+            </div>
+            <div class="output-tab" data-tab="ir-tab-pane" id="tab-ir">
+              IR
+              {% if compiled and result.ir %}<span class="tab-badge">✓</span>{% endif %}
+            </div>
+            <div class="output-tab" data-tab="optimized-ir-tab-pane" id="tab-optimized-ir">
+              Optimized IR
+              {% if compiled and result.optimized_ir %}<span class="tab-badge">✓</span>{% endif %}
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div id="output-actions">
+            <button type="button" id="copy-output-btn" class="btn-icon" data-tooltip="Copy to clipboard" aria-label="Copy output">
+              📋
+            </button>
+            <button type="button" id="download-output-btn" class="btn-icon" data-tooltip="Download output" aria-label="Download output">
+              ⬇
+            </button>
+          </div>
+
+          <!-- Content panes -->
+          <div id="output-content-area">
+            <!-- Output tab -->
+            <div class="output-pane active" id="output-tab-pane">
+              {% if compiled and result.output %}
+                <pre><code class="language-{{ target }}">{{ result.output }}</code></pre>
+              {% elif compiled %}
+                <div class="empty-state">
+                  <div class="empty-state-icon">⚠️</div>
+                  <div class="empty-state-title">No Output</div>
+                  <div class="empty-state-desc">The compiler did not produce output code. Check the error panel below.</div>
+                </div>
+              {% else %}
+                <div class="empty-state">
+                  <div class="empty-state-icon">🚀</div>
+                  <div class="empty-state-title">Ready to Compile</div>
+                  <div class="empty-state-desc">Write your source code in the editor, select a target language, and click Compile.</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- AST tab -->
+            <div class="output-pane" id="ast-tab-pane">
+              {% if compiled and result.ast %}
+                <pre><code>{{ result.ast }}</code></pre>
+              {% else %}
+                <div class="empty-state">
+                  <div class="empty-state-icon">🌳</div>
+                  <div class="empty-state-title">Abstract Syntax Tree</div>
+                  <div class="empty-state-desc">The AST representation will appear here after compilation.</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- IR tab -->
+            <div class="output-pane" id="ir-tab-pane">
+              {% if compiled and result.ir %}
+                <pre><code>{{ result.ir }}</code></pre>
+              {% else %}
+                <div class="empty-state">
+                  <div class="empty-state-icon">⚙️</div>
+                  <div class="empty-state-title">Intermediate Representation</div>
+                  <div class="empty-state-desc">The IR listing will appear here after compilation.</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Optimized IR tab -->
+            <div class="output-pane" id="optimized-ir-tab-pane">
+              {% if compiled and result.optimized_ir %}
+                <pre><code>{{ result.optimized_ir }}</code></pre>
+              {% else %}
+                <div class="empty-state">
+                  <div class="empty-state-icon">✨</div>
+                  <div class="empty-state-title">Optimized IR</div>
+                  <div class="empty-state-desc">The optimized IR will appear here after compilation.</div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ ERROR PANEL ══════════ -->
+      <div id="error-panel" class="{% if not compiled or not result.errors %}collapsed{% endif %}">
+        <div id="error-panel-header" role="button" tabindex="0" aria-label="Toggle error panel">
+          <div id="error-panel-title">
+            {% if result.errors %}
+              <span style="color: var(--error);">✕</span> Problems
+              <span class="error-count-badge has-errors">{{ result.errors|length }}</span>
+            {% elif compiled %}
+              <span style="color: var(--success);">✓</span> Problems
+              <span class="error-count-badge no-errors">0</span>
+            {% else %}
+              <span style="color: var(--text-muted);">○</span> Problems
+              <span class="error-count-badge no-errors">0</span>
+            {% endif %}
+          </div>
+          <span id="error-toggle-icon">▼</span>
+        </div>
+        <div id="error-panel-body">
+          {% if result.errors %}
+            {% for err in result.errors %}
+            <div class="error-item">
+              <span class="error-icon">✕</span>
+              <span>{{ err }}</span>
+            </div>
+            {% endfor %}
+          {% elif compiled %}
+            <div class="success-message">
+              <span>✓</span> Compilation completed successfully — no errors.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ══════════ STATUS BAR ══════════ -->
+      <div id="status-bar">
+        <div class="status-group">
+          <div class="status-item">
+            <span class="status-dot {% if result.errors %}error{% endif %}"></span>
+            <span id="status-compiler-state">
+              {% if compiled and not result.errors %}Compiled{% elif compiled and result.errors %}Errors{% else %}Ready{% endif %}
+            </span>
+          </div>
+          <div class="status-item">
+            Target: <strong id="status-target-lang">{{ target }}</strong>
+          </div>
+        </div>
+        <div class="status-group">
+          <div class="status-item" id="status-line-info">
+            Ln 1, Col 1
+          </div>
+          <div class="status-item">
+            UTF-8
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <!-- Toast container for notifications -->
+  <div id="toast-container"></div>
+
+  <!-- Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+  <script>
+  /* ================================================================
+     Multi-Target Compiler — Frontend Logic
+     ================================================================ */
+  (function () {
+    'use strict';
+
+    // ── DOM references ──
+    const form             = document.getElementById('compile-form');
+    const compileBtn       = document.getElementById('compile-btn');
+    const clearBtn         = document.getElementById('clear-btn');
+    const codeEditor       = document.getElementById('code-editor');
+    const resizeHandle     = document.getElementById('resize-handle');
+    const editorPanel      = document.getElementById('editor-panel');
+    const outputPanel      = document.getElementById('output-panel');
+    const workspace        = document.getElementById('workspace');
+    const errorPanel       = document.getElementById('error-panel');
+    const errorHeader      = document.getElementById('error-panel-header');
+    const copyBtn          = document.getElementById('copy-output-btn');
+    const downloadBtn      = document.getElementById('download-output-btn');
+    const statusLineInfo   = document.getElementById('status-line-info');
+    const toastContainer   = document.getElementById('toast-container');
+    const targetSelect     = document.getElementById('target-language-select');
+    const statusTarget     = document.getElementById('status-target-lang');
+
+    // ── Tab Switching ──
+    const outputTabs = document.querySelectorAll('.output-tab');
+    const outputPanes = document.querySelectorAll('.output-pane');
+
+    outputTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetPane = tab.getAttribute('data-tab');
+
+        outputTabs.forEach(t => t.classList.remove('active'));
+        outputPanes.forEach(p => p.classList.remove('active'));
+
+        tab.classList.add('active');
+        const pane = document.getElementById(targetPane);
+        if (pane) {
+          pane.classList.add('active');
+          // Re-highlight Prism for the newly visible pane
+          Prism.highlightAllUnder(pane);
+        }
+      });
+    });
+
+    // ── Error Panel Toggle ──
+    errorHeader.addEventListener('click', () => {
+      errorPanel.classList.toggle('collapsed');
+    });
+
+    errorHeader.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        errorPanel.classList.toggle('collapsed');
+      }
+    });
+
+    // ── Compile Form — Loading State ──
+    form.addEventListener('submit', () => {
+      compileBtn.classList.add('compiling');
+    });
+
+    // ── Keyboard Shortcut: Ctrl+Enter to compile ──
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        compileBtn.classList.add('compiling');
+        form.submit();
+      }
+    });
+
+    // ── Tab key in editor ──
+    codeEditor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+        codeEditor.value = codeEditor.value.substring(0, start) + '    ' + codeEditor.value.substring(end);
+        codeEditor.selectionStart = codeEditor.selectionEnd = start + 4;
+      }
+    });
+
+    // ── Clear Button ──
+    clearBtn.addEventListener('click', () => {
+      codeEditor.value = '';
+      codeEditor.focus();
+      showToast('Editor cleared', '🧹');
+    });
+
+    // ── Editor cursor position tracking ──
+    function updateCursorInfo() {
+      const val = codeEditor.value.substring(0, codeEditor.selectionStart);
+      const lines = val.split('\n');
+      const line = lines.length;
+      const col = lines[lines.length - 1].length + 1;
+      statusLineInfo.textContent = `Ln ${line}, Col ${col}`;
+    }
+
+    codeEditor.addEventListener('input', updateCursorInfo);
+    codeEditor.addEventListener('click', updateCursorInfo);
+    codeEditor.addEventListener('keyup', updateCursorInfo);
+    codeEditor.addEventListener('focus', updateCursorInfo);
+
+    // ── Target language → status bar ──
+    targetSelect.addEventListener('change', () => {
+      statusTarget.textContent = targetSelect.value;
+    });
+
+    // ── Copy to Clipboard ──
+    copyBtn.addEventListener('click', () => {
+      const activePane = document.querySelector('.output-pane.active');
+      if (!activePane) return;
+
+      const pre = activePane.querySelector('pre');
+      if (!pre) {
+        showToast('Nothing to copy', '⚠️');
+        return;
+      }
+
+      const text = pre.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard!', '✅');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Copied to clipboard!', '✅');
+      });
+    });
+
+    // ── Download Output ──
+    downloadBtn.addEventListener('click', () => {
+      const activePane = document.querySelector('.output-pane.active');
+      if (!activePane) return;
+
+      const pre = activePane.querySelector('pre');
+      if (!pre) {
+        showToast('Nothing to download', '⚠️');
+        return;
+      }
+
+      const text = pre.textContent;
+      const target = targetSelect.value;
+      const extMap = { python: '.py', cpp: '.cpp', java: '.java' };
+      const ext = extMap[target] || '.txt';
+
+      // Determine tab name for filename
+      const activeTab = document.querySelector('.output-tab.active');
+      const tabName = activeTab ? activeTab.textContent.trim().replace(/[^a-zA-Z]/g, '_').toLowerCase() : 'output';
+      const filename = `compiled_${tabName}${ext}`;
+
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('File downloaded!', '⬇️');
+    });
+
+    // ── Resizable Panels ──
+    let isResizing = false;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      resizeHandle.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+
+      const rect = workspace.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const totalWidth = rect.width;
+      const handleWidth = resizeHandle.offsetWidth;
+
+      // Clamp between 20% and 80%
+      const minFraction = 0.2;
+      const maxFraction = 0.8;
+      let fraction = offsetX / totalWidth;
+      fraction = Math.max(minFraction, Math.min(maxFraction, fraction));
+
+      const editorWidth = fraction * totalWidth;
+      const outputWidth = totalWidth - editorWidth - handleWidth;
+
+      editorPanel.style.flex = 'none';
+      editorPanel.style.width = editorWidth + 'px';
+      outputPanel.style.flex = 'none';
+      outputPanel.style.width = outputWidth + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isResizing) {
+        isResizing = false;
+        resizeHandle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
+
+    // ── Toast Notifications ──
+    function showToast(message, icon) {
+      icon = icon || 'ℹ️';
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>${icon}</span> ${message}`;
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 3000);
+    }
+
+    // ── Initial Prism Highlight ──
+    Prism.highlightAll();
+
+    // ── Auto-focus editor on load ──
+    if (!{{ 'true' if compiled else 'false' }}) {
+      codeEditor.focus();
+    }
+
+  })();
+  </script>
+</body>
+</html>
